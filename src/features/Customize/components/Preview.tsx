@@ -1,11 +1,14 @@
 import { Box, Button, Text, useBoolean } from "@chakra-ui/react";
 import React from "react";
+import { useAppSelector } from "../../../redux/hooks";
 import Card from "./Card";
 
 interface Props {}
 
 const Preview: React.FC<Props> = () => {
   const [flag, setFlag] = useBoolean();
+  const _csv = useAppSelector((state) => state.csv.value);
+
   const toggleView = () => {
     alert();
   };
@@ -45,8 +48,8 @@ const Preview: React.FC<Props> = () => {
         overflowY={{ base: "hidden", md: "scroll" }}
         overflowX={{ base: "scroll", md: "hidden" }}
       >
-        {new Array(100).fill(0).map((data: number, i: number) => (
-          <Card key={i}>{i}</Card>
+        {_csv.map((data: string, i: number) => (
+          <Card key={data + i}>{data}</Card>
         ))}
       </Box>
     </Box>

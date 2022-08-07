@@ -44,7 +44,6 @@ const Upload: React.FC = () => {
   };
 
   React.useEffect(() => {
-    console.log(csvData);
     saveLocalData({
       imageData,
       csvData,

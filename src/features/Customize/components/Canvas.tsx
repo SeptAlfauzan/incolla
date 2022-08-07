@@ -1,7 +1,9 @@
 import { background, Box, useBoolean } from "@chakra-ui/react";
 import React from "react";
+import { useAppSelector } from "../../../redux/hooks";
 import Canvas from "./../utils/canvas";
 import Images from "./../utils/image";
+import DraggableText from "./DragableText";
 
 const PLUS_CODE = 187;
 const MINUS_CODE = 189;
@@ -12,6 +14,9 @@ interface Props {
   imageUrl: string;
 }
 const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
+  const font = useAppSelector((state) => state.font);
+  const text = useAppSelector((state) => state.text);
+
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const container = React.useRef<HTMLCanvasElement>(null);
   const [flag, setFlag] = useBoolean();
@@ -60,12 +65,30 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
             bgImage.height
           )
         : null;
-      ctx ? ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height) : null;
-      ctx ? (ctx.fillStyle = "#ff0000") : null;
-      ctx ? ctx.fillRect(0, 0, bgImage.width - 100, 75) : null;
+      ctx ? ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height) : null; //add image to canvas
+      // SET CUSTOM FONT
+      const myFont = new FontFace(font.value.family, `url(${font.value.url})`);
+      myFont.load().then(function (customFont) {
+        document.fonts.add(customFont);
+        console.log("font loaded!", customFont);
+
+        // ctx ? (ctx.font = `10px Arial`) : null;
+        // ctx ? (ctx.fillStyle = "pink") : null;
+        // ctx ? ctx.fillText("hallo dunia", 100, 100) : null;
+      });
+      ctx ? (ctx.font = `${font.value.size}px Poppins`) : null;
+      ctx ? (ctx.fillStyle = "pink") : null;
+      ctx
+        ? ctx.fillText(
+            "hallo dunia",
+            text.value.x,
+            text.value.y + font.value.size + 3
+          )
+        : null;
+
       Canvas.redrawForegroundCanvas(canvasRef.current, container.current);
     };
-  }, [canvasRef.current]);
+  }, [text.value, font.value.size]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -80,7 +103,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   return (
     <Box
       flexGrow={1}
-      width={"100px"}
+      width={"500px"}
+      borderWidth={2}
+      borderColor={"black"}
       overflow={"clip"}
       order={{ base: 1, md: 2 }}
       onMouseEnter={setFlag.on}
@@ -91,9 +116,13 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       alignContent={"center"}
       onMouseLeave={setFlag.off}
     >
-      <canvas ref={container}>
+      {/* <canvas id="bound-target" ref={container}> */}
+      <Box id="canvas-parent" position="relative">
+        <DraggableText bounds="#canvas-parent" label="hallo dunia" />
         <canvas ref={canvasRef} />
-      </canvas>
+      </Box>
+      {/* </canvas> */}
+
       {/* <Box transform={`scale(${scale})`} ref={container}>
         <canvas ref={canvasRef}>adasd</canvas>
       </Box> */}

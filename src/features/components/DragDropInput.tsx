@@ -71,6 +71,7 @@ const DragDropInput: React.FC<Props> = ({
       paddingY={"10px"}
       position={"relative"}
       borderStyle={"dashed"}
+      _hover={{ cursor: "pointer" }}
       width={{ base: "full", md: "45%" }}
       {...getRootProps()}
     >
