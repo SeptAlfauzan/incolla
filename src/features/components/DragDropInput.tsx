@@ -31,6 +31,7 @@ const DragDropInput: React.FC<Props> = ({
 
   const [error, setError] = React.useState<string>("");
   const [file, setFile] = React.useState<string | undefined>("");
+  const [filled, setFilled] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     fileRejections.map(({ file, errors }) => {
@@ -40,6 +41,7 @@ const DragDropInput: React.FC<Props> = ({
           (error) => error.message
         )}`
       );
+      setFilled(false);
     });
   }, [fileRejections]);
 
@@ -53,12 +55,13 @@ const DragDropInput: React.FC<Props> = ({
     acceptedFiles.map((file: FileWithPath) => {
       setError("");
       onAccept(file);
+      setFilled(true);
     });
   }, [acceptedFiles]);
 
   return (
     <Box
-      background={isDragActive ? "twitter.300" : ""}
+      background={isDragActive || filled ? "twitter.100" : ""}
       borderWidth={"2px"}
       display={"flex"}
       alignItems={"center"}

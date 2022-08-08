@@ -1,6 +1,7 @@
-import { Box, Button, Text } from "@chakra-ui/react";
+import { Box, Button, Link, Text } from "@chakra-ui/react";
 import React from "react";
 import { useAppSelector } from "../../../redux/hooks";
+import { download } from "../libs/download";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
 
@@ -8,6 +9,15 @@ interface Props {}
 
 const Setting: React.FC<Props> = () => {
   const font = useAppSelector((state) => state.font);
+  const canvas = useAppSelector((state) => state.canvas);
+  const selectedIndex = useAppSelector((state) => state.selectedIndex);
+
+  // React.useEffect(() => {
+  //   alert(selectedIndex.value);
+  // }, [canvas.value]);
+  const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) =>
+    download(event, canvas.value);
+
   return (
     <Box
       height={{ base: "75%", md: "full" }}
@@ -30,7 +40,13 @@ const Setting: React.FC<Props> = () => {
           <FontSize />
         </Box>
       </>
-      <Button
+      <Box marginTop={10}>
+        <Text marginBottom={4} color={"gray.500"}>
+          Download Preview
+        </Text>
+        <img src={canvas.value} />
+      </Box>
+      <Link
         borderWidth={"4px"}
         borderColor={"blackAlpha.700"}
         fontWeight={700}
@@ -44,9 +60,14 @@ const Setting: React.FC<Props> = () => {
           backgroundColor: "blackAlpha.800",
           color: "white",
         }}
+        textAlign={"center"}
+        onClick={handleDownload}
       >
+        {/* <Button
+        > */}
         Download
-      </Button>
+        {/* </Button> */}
+      </Link>
     </Box>
   );
 };

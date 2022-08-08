@@ -31,13 +31,16 @@ const DraggableText: React.FC<Props> = ({ bounds, label }) => {
       bounds={bounds}
     >
       <Text
+        cursor={"move"}
         className="handle"
         fontFamily={"Poppins"}
         borderWidth={2}
         fontSize={font.value.size}
         position={"absolute"}
+        textOverflow={"clip"}
         height={"fit-content"}
         width={"fit-content"}
+        wordBreak={"keep-all"}
         color={"red.400"}
       >
         {label}

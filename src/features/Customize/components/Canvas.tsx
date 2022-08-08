@@ -1,6 +1,7 @@
-import { background, Box, useBoolean } from "@chakra-ui/react";
+import { background, Box, position, useBoolean } from "@chakra-ui/react";
 import React from "react";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
 import Canvas from "./../utils/canvas";
 import Images from "./../utils/image";
 import DraggableText from "./DragableText";
@@ -16,24 +17,14 @@ interface Props {
 const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const font = useAppSelector((state) => state.font);
   const text = useAppSelector((state) => state.text);
+  const csv = useAppSelector((state) => state.csv);
+  const selectedIndex = useAppSelector((state) => state.selectedIndex);
+  const dispatch = useAppDispatch();
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const container = React.useRef<HTMLCanvasElement>(null);
   const [flag, setFlag] = useBoolean();
   const [scale, setScale] = React.useState<number>(1);
-
-  const download = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (e.target instanceof HTMLAnchorElement && canvasRef.current) {
-      try {
-        const anchor: HTMLAnchorElement = e.target;
-        const data = Canvas.toDataImage(canvasRef.current);
-        Canvas.download(anchor, data);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    console.log(e.target, canvasRef.current);
-  };
 
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && (e.keyCode === 187 || e.keyCode === 189) && !flag) {
@@ -80,15 +71,15 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       ctx ? (ctx.fillStyle = "pink") : null;
       ctx
         ? ctx.fillText(
-            "hallo dunia",
+            csv.value[selectedIndex.value],
             text.value.x,
-            text.value.y + font.value.size + 3
+            text.value.y + font.value.size
           )
         : null;
 
-      Canvas.redrawForegroundCanvas(canvasRef.current, container.current);
+      // Canvas.redrawForegroundCanvas(canvasRef.current, container.current);
     };
-  }, [text.value, font.value.size]);
+  }, [text.value, font.value.size, selectedIndex.value]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -99,6 +90,18 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     console.log(scale);
     container.current?.getContext("2d")?.scale(scale, scale);
   }, [scale]);
+
+  React.useEffect(() => {
+    if (!canvasRef.current) return;
+    const canvasImage = canvasRef.current.toDataURL("image/png");
+    dispatch(setCanvas(canvasImage));
+  }, [
+    font.value.size,
+    font.value.family,
+    text.value.x,
+    text.value.y,
+    selectedIndex.value,
+  ]);
 
   return (
     <Box
@@ -117,8 +120,11 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       onMouseLeave={setFlag.off}
     >
       {/* <canvas id="bound-target" ref={container}> */}
-      <Box id="canvas-parent" position="relative">
-        <DraggableText bounds="#canvas-parent" label="hallo dunia" />
+      <Box id="canvas-parent" position="relative" overflow={"clip"}>
+        <DraggableText
+          bounds="#canvas-parent"
+          label={csv.value[selectedIndex.value]}
+        />
         <canvas ref={canvasRef} />
       </Box>
       {/* </canvas> */}
@@ -126,9 +132,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       {/* <Box transform={`scale(${scale})`} ref={container}>
         <canvas ref={canvasRef}>adasd</canvas>
       </Box> */}
-      <a href="#" onClick={download}>
+      {/* <a href="#" onClick={download}>
         download
-      </a>
+      </a> */}
     </Box>
   );
 };

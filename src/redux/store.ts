@@ -4,6 +4,7 @@ import csvReducer from "./reducers/csv/csvSlice";
 import fontReducer from "./reducers/font/fontSlice";
 import canvasReducer from "./reducers/canvas/canvasSlice";
 import textReducer from "./reducers/text/textSlice";
+import selectedReducer from "./reducers/selected/selectedSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     font: fontReducer,
     canvas: canvasReducer,
     text: textReducer,
+    selectedIndex: selectedReducer,
   },
 });
 

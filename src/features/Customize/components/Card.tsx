@@ -2,10 +2,13 @@ import { Box } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 interface Props {
   children: ReactNode;
+  onClick: () => void;
 }
-const Card: React.FC<Props> = ({ children }) => {
+const Card: React.FC<Props> = ({ children, onClick }) => {
   return (
     <Box
+      cursor={"pointer"}
+      onClick={onClick}
       width={{ base: "200px", md: "full" }}
       flex={"none"}
       height={{ base: "full", md: "100px" }}

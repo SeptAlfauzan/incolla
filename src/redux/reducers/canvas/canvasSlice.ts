@@ -1,20 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface State {
-  value: HTMLCanvasElement | null;
+  value: string;
 }
 const initialState: State = {
-  value: null,
+  value: "",
 };
 
 export const canvasSlice = createSlice({
   name: "canvas",
   initialState,
   reducers: {
-    setCanvas: (state, action: PayloadAction<HTMLCanvasElement>) => {
-      console.log(state);
-      console.log(action.payload);
-      // state.value = action.payload;
+    setCanvas: (state, action: PayloadAction<string>) => {
+      state.value = action.payload;
     },
   },
 });
