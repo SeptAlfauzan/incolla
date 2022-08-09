@@ -5,13 +5,19 @@ interface Position {
   y: number;
 }
 interface State {
-  value: Position;
+  value: {
+    position: Position;
+    color: string;
+  };
 }
 
 const initialState: State = {
   value: {
-    x: 100,
-    y: 100,
+    position: {
+      x: 100,
+      y: 100,
+    },
+    color: "black",
   },
 };
 
@@ -20,10 +26,13 @@ const textSlice = createSlice({
   initialState,
   reducers: {
     setTextPosition: (state, action: PayloadAction<Position>) => {
-      state.value = action.payload;
+      state.value.position = action.payload;
+    },
+    setTextColor: (state, action: PayloadAction<string>) => {
+      state.value.color = action.payload;
     },
   },
 });
 
-export const { setTextPosition } = textSlice.actions;
+export const { setTextPosition, setTextColor } = textSlice.actions;
 export default textSlice.reducer;

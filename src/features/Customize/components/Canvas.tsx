@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
 import Canvas from "./../utils/canvas";
 import Images from "./../utils/image";
-import DraggableText from "./DragableText";
+import DraggableText from "./DraggableText";
 
 const PLUS_CODE = 187;
 const MINUS_CODE = 189;
@@ -25,6 +25,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const container = React.useRef<HTMLCanvasElement>(null);
   const [flag, setFlag] = useBoolean();
   const [scale, setScale] = React.useState<number>(1);
+  const [context2d, setContext2d] = React.useState<
+    CanvasRenderingContext2D | null | undefined
+  >();
 
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && (e.keyCode === 187 || e.keyCode === 189) && !flag) {
@@ -61,25 +64,33 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       const myFont = new FontFace(font.value.family, `url(${font.value.url})`);
       myFont.load().then(function (customFont) {
         document.fonts.add(customFont);
-        console.log("font loaded!", customFont);
+        // console.log("font loaded!", customFont);
 
         // ctx ? (ctx.font = `10px Arial`) : null;
         // ctx ? (ctx.fillStyle = "pink") : null;
         // ctx ? ctx.fillText("hallo dunia", 100, 100) : null;
       });
       ctx ? (ctx.font = `${font.value.size}px Poppins`) : null;
-      ctx ? (ctx.fillStyle = "pink") : null;
+      ctx ? (ctx.fillStyle = text.value.color) : null;
       ctx
         ? ctx.fillText(
             csv.value[selectedIndex.value],
-            text.value.x,
-            text.value.y + font.value.size
+            text.value.position.x,
+            text.value.position.y + font.value.size
           )
         : null;
-
+      setContext2d(ctx);
+      if (!canvasRef.current) return;
+      const canvasImage = canvasRef.current.toDataURL("image/png");
+      dispatch(setCanvas(canvasImage));
       // Canvas.redrawForegroundCanvas(canvasRef.current, container.current);
     };
-  }, [text.value, font.value.size, selectedIndex.value]);
+  }, [
+    // text.value.position,
+    text.value,
+    font.value.size,
+    selectedIndex.value,
+  ]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -91,17 +102,18 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     container.current?.getContext("2d")?.scale(scale, scale);
   }, [scale]);
 
-  React.useEffect(() => {
-    if (!canvasRef.current) return;
-    const canvasImage = canvasRef.current.toDataURL("image/png");
-    dispatch(setCanvas(canvasImage));
-  }, [
-    font.value.size,
-    font.value.family,
-    text.value.x,
-    text.value.y,
-    selectedIndex.value,
-  ]);
+  // React.useEffect(() => {
+  //   if (!canvasRef.current) return;
+  //   const canvasImage = canvasRef.current.toDataURL("image/png");
+  //   dispatch(setCanvas(canvasImage));
+  // }, [
+  //   font.value.size,
+  //   font.value.family,
+  //   text.value.position.x,
+  //   text.value.position.y,
+  //   selectedIndex.value,
+  //   context2d,
+  // ]);
 
   return (
     <Box

@@ -4,6 +4,7 @@ import { useAppSelector } from "../../../redux/hooks";
 import { download } from "../libs/download";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
+import TextColor from "./TextColor";
 
 interface Props {}
 
@@ -24,14 +25,15 @@ const Setting: React.FC<Props> = () => {
       backgroundColor={"whiteAlpha.800"}
       width={{ base: "200px", md: "300px" }}
       display={"flex"}
+      gap={"15px"}
       order={{ base: 2, md: 3 }}
       flexDirection={"column"}
       marginLeft={"auto"}
       paddingX={"18px"}
       paddingY={"28px"}
     >
-      <Text marginBottom={10}>Settings</Text>
-      <>
+      <Text>Settings</Text>
+      <Box>
         <Text fontSize={14} marginBottom={5}>
           Text
         </Text>
@@ -39,13 +41,14 @@ const Setting: React.FC<Props> = () => {
           <FontSelector />
           <FontSize />
         </Box>
-      </>
-      <Box marginTop={10}>
+      </Box>
+      <Box>
         <Text marginBottom={4} color={"gray.500"}>
           Download Preview
         </Text>
         <img src={canvas.value} />
       </Box>
+      <TextColor />
       <Link
         borderWidth={"4px"}
         borderColor={"blackAlpha.700"}

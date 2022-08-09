@@ -46,7 +46,7 @@ const Preview: React.FC<Props> = () => {
         Preview
       </Button>
       <Box
-        gap={"10px"}
+        gap={"12px"}
         bottom={0}
         height={"full"}
         width={"full"}
@@ -54,11 +54,13 @@ const Preview: React.FC<Props> = () => {
         flexDirection={{ base: "row", md: "column" }}
         overflowY={{ base: "hidden", md: "scroll" }}
         overflowX={{ base: "scroll", md: "hidden" }}
+        paddingX={"8px"}
       >
         {_csv.map((data: string, i: number) => (
-          <Card key={data + i} onClick={() => handleClick(i)}>
-            {data}
-          </Card>
+          <Box key={data + i} display={"flex"} width={"full"}>
+            <Text>{i + 1}</Text>
+            <Card onClick={() => handleClick(i)}>{data}</Card>
+          </Box>
         ))}
       </Box>
     </Box>
