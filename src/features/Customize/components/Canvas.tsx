@@ -2,6 +2,7 @@ import { background, Box, position, useBoolean } from "@chakra-ui/react";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
+import { getLongestNameWidth } from "../utils/csv";
 import Canvas from "./../utils/canvas";
 import Images from "./../utils/image";
 import DraggableText from "./DraggableText";
@@ -10,6 +11,7 @@ const PLUS_CODE = 187;
 const MINUS_CODE = 189;
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.3;
+let lastRequest: null | NodeJS.Timeout = null;
 
 interface Props {
   imageUrl: string;
@@ -25,9 +27,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const container = React.useRef<HTMLCanvasElement>(null);
   const [flag, setFlag] = useBoolean();
   const [scale, setScale] = React.useState<number>(1);
-  const [context2d, setContext2d] = React.useState<
-    CanvasRenderingContext2D | null | undefined
-  >();
+  const [trigger, setTrigger] = React.useState<boolean>();
 
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && (e.keyCode === 187 || e.keyCode === 189) && !flag) {
@@ -43,33 +43,35 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     }
   };
 
+  const setCanvasToImgwithDelay = (delay: number) => {
+    if (lastRequest) {
+      clearTimeout(lastRequest);
+    }
+    lastRequest = setTimeout(() => {
+      dispatch(setCanvas([]));
+      const canvasImages: string[] = csv.value.map((name) =>
+        canvasRef.current ? canvasRef.current.toDataURL("image/png") : ""
+      );
+      // const canvasImage = canvasRef.current?.toDataURL("image/png");
+      dispatch(setCanvas(canvasImages));
+    }, delay);
+  };
+
   React.useEffect(() => {
     const ctx: CanvasRenderingContext2D | undefined | null =
       canvasRef.current?.getContext("2d");
-    const ctxBackground: CanvasRenderingContext2D | undefined | null =
-      container.current?.getContext("2d");
 
     const bgImage: HTMLImageElement = Images.init(imageUrl);
 
     bgImage.onload = function () {
-      ctx && canvasRef.current
-        ? Canvas.resizeAsTarget(
-            canvasRef.current,
-            bgImage.width,
-            bgImage.height
-          )
-        : null;
+      canvasRef.current &&
+        ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); //clear previous canvas
+
+      canvasRef.current &&
+        Canvas.resizeAsTarget(canvasRef.current, bgImage.width, bgImage.height);
       ctx ? ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height) : null; //add image to canvas
       // SET CUSTOM FONT
-      const myFont = new FontFace(font.value.family, `url(${font.value.url})`);
-      myFont.load().then(function (customFont) {
-        document.fonts.add(customFont);
-        // console.log("font loaded!", customFont);
 
-        // ctx ? (ctx.font = `10px Arial`) : null;
-        // ctx ? (ctx.fillStyle = "pink") : null;
-        // ctx ? ctx.fillText("hallo dunia", 100, 100) : null;
-      });
       ctx ? (ctx.font = `${font.value.size}px Poppins`) : null;
       ctx ? (ctx.fillStyle = text.value.color) : null;
       ctx
@@ -79,18 +81,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
             text.value.position.y + font.value.size
           )
         : null;
-      setContext2d(ctx);
-      if (!canvasRef.current) return;
-      const canvasImage = canvasRef.current.toDataURL("image/png");
-      dispatch(setCanvas(canvasImage));
-      // Canvas.redrawForegroundCanvas(canvasRef.current, container.current);
     };
-  }, [
-    // text.value.position,
-    text.value,
-    font.value.size,
-    selectedIndex.value,
-  ]);
+    setTrigger(!trigger);
+  }, [text.value, font.value.size, selectedIndex.value]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -102,18 +95,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     container.current?.getContext("2d")?.scale(scale, scale);
   }, [scale]);
 
-  // React.useEffect(() => {
-  //   if (!canvasRef.current) return;
-  //   const canvasImage = canvasRef.current.toDataURL("image/png");
-  //   dispatch(setCanvas(canvasImage));
-  // }, [
-  //   font.value.size,
-  //   font.value.family,
-  //   text.value.position.x,
-  //   text.value.position.y,
-  //   selectedIndex.value,
-  //   context2d,
-  // ]);
+  React.useMemo(() => {
+    setCanvasToImgwithDelay(1000);
+  }, [trigger]);
 
   return (
     <Box
@@ -135,6 +119,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       <Box id="canvas-parent" position="relative" overflow={"clip"}>
         <DraggableText
           bounds="#canvas-parent"
+          longestName={getLongestNameWidth(csv.value)}
           label={csv.value[selectedIndex.value]}
         />
         <canvas ref={canvasRef} />

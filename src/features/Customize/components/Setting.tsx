@@ -1,7 +1,8 @@
 import { Box, Button, Link, Text } from "@chakra-ui/react";
 import React from "react";
 import { useAppSelector } from "../../../redux/hooks";
-import { download } from "../libs/download";
+import { download, downloadAll } from "../utils/download";
+import DownloadPreview from "./DownloadPreview";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
 import TextColor from "./TextColor";
@@ -17,8 +18,10 @@ const Setting: React.FC<Props> = () => {
   //   alert(selectedIndex.value);
   // }, [canvas.value]);
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) =>
-    download(event, canvas.value);
+    download(event, canvas.value[selectedIndex.value]);
 
+  const handleDownloadAll = (event: React.MouseEvent<HTMLAnchorElement>) =>
+    downloadAll(event, canvas.value);
   return (
     <Box
       height={{ base: "75%", md: "full" }}
@@ -42,35 +45,49 @@ const Setting: React.FC<Props> = () => {
           <FontSize />
         </Box>
       </Box>
-      <Box>
-        <Text marginBottom={4} color={"gray.500"}>
-          Download Preview
-        </Text>
-        <img src={canvas.value} />
-      </Box>
+      <DownloadPreview />
       <TextColor />
-      <Link
-        borderWidth={"4px"}
-        borderColor={"blackAlpha.700"}
-        fontWeight={700}
-        width={"full"}
-        marginX={"auto"}
-        marginTop={"auto"}
-        marginBottom={"18px"}
-        borderRadius={10}
-        backgroundColor={"white"}
-        _hover={{
-          backgroundColor: "blackAlpha.800",
-          color: "white",
-        }}
-        textAlign={"center"}
-        onClick={handleDownload}
-      >
-        {/* <Button
+      <Box display={"flex"} flexDirection={"column"} marginTop={"auto"}>
+        <Link
+          borderWidth={"4px"}
+          borderColor={"blackAlpha.700"}
+          fontWeight={700}
+          width={"full"}
+          marginX={"auto"}
+          marginBottom={"18px"}
+          borderRadius={10}
+          backgroundColor={"white"}
+          _hover={{
+            backgroundColor: "blackAlpha.800",
+            color: "white",
+          }}
+          textAlign={"center"}
+          onClick={handleDownload}
+        >
+          {/* <Button
         > */}
-        Download
-        {/* </Button> */}
-      </Link>
+          Download
+          {/* </Button> */}
+        </Link>
+        <Link
+          borderWidth={"4px"}
+          borderColor={"blackAlpha.700"}
+          fontWeight={700}
+          width={"full"}
+          marginX={"auto"}
+          marginBottom={"18px"}
+          borderRadius={10}
+          backgroundColor={"white"}
+          _hover={{
+            backgroundColor: "blackAlpha.800",
+            color: "white",
+          }}
+          textAlign={"center"}
+          onClick={handleDownloadAll}
+        >
+          Download All
+        </Link>
+      </Box>
     </Box>
   );
 };

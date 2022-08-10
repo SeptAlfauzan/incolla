@@ -1,17 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface State {
-  value: string;
+  value: string[];
 }
 const initialState: State = {
-  value: "",
+  value: [],
 };
 
 export const canvasSlice = createSlice({
   name: "canvas",
   initialState,
   reducers: {
-    setCanvas: (state, action: PayloadAction<string>) => {
+    setCanvas: (state, action: PayloadAction<string[]>) => {
       state.value = action.payload;
     },
   },

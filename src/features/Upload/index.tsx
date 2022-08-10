@@ -16,13 +16,15 @@ interface Datas {
   csvData: string[];
 }
 const Upload: React.FC = () => {
-  window.onbeforeunload = () =>
-    "Data will be lost if you leave the page, are you sure?";
-
   // redux
   const _image = useAppSelector((state) => state.image.value);
   const _csv = useAppSelector((state) => state.csv.value);
   const dispatch = useAppDispatch();
+
+  _image && _csv
+    ? (window.onbeforeunload = () =>
+        "Data will be lost if you leave the page, are you sure?")
+    : null;
 
   const [imageaccept, setImageaccept] = React.useState<boolean>(false);
   const [csvaccept, setCsvaccept] = React.useState<boolean>(false);

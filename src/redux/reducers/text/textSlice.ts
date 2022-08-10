@@ -8,6 +8,8 @@ interface State {
   value: {
     position: Position;
     color: string;
+    align: "center" | "left" | "right";
+    width: number;
   };
 }
 
@@ -18,6 +20,8 @@ const initialState: State = {
       y: 100,
     },
     color: "black",
+    align: "center",
+    width: 0,
   },
 };
 
@@ -31,8 +35,15 @@ const textSlice = createSlice({
     setTextColor: (state, action: PayloadAction<string>) => {
       state.value.color = action.payload;
     },
+    setAlign: (state, action: PayloadAction<"center" | "left" | "right">) => {
+      state.value.align = action.payload;
+    },
+    setWidth: (state, action: PayloadAction<number>) => {
+      state.value.width = action.payload;
+    },
   },
 });
 
-export const { setTextPosition, setTextColor } = textSlice.actions;
+export const { setTextPosition, setTextColor, setAlign, setWidth } =
+  textSlice.actions;
 export default textSlice.reducer;

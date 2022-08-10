@@ -10,10 +10,11 @@ import NoData from "./components/NoData";
 interface Props {}
 
 const Customize: React.FC<Props> = () => {
-  window.onbeforeunload = () =>
-    "Data will be lost if you leave the page, are you sure?";
-
   const _image = useAppSelector((state) => state.image.value);
+  _image
+    ? (window.onbeforeunload = () =>
+        "Data will be lost if you leave the page, are you sure?")
+    : null;
 
   if (_image === "") return <NoData />;
   return (
