@@ -22,7 +22,7 @@ export const useCanvasImgData = (
   React.useEffect(() => {
     if (!canvas) return;
     const canvasImage = canvas.toDataURL("image/png");
-    dispatch(setCanvas(canvasImage));
+    // dispatch(setCanvas(canvasImage));
   }, [canvas?.getContext("2d"), triggerConfig]);
   return [_canvas];
 };
