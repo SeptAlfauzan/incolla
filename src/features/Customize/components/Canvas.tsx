@@ -24,7 +24,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const dispatch = useAppDispatch();
 
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const container = React.useRef<HTMLCanvasElement>(null);
+  const container = React.useRef<HTMLDivElement>(null);
   const [flag, setFlag] = useBoolean();
   const [scale, setScale] = React.useState<number>(1);
   const [trigger, setTrigger] = React.useState<boolean>();
@@ -43,16 +43,28 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     }
   };
 
-  const setCanvasToImgwithDelay = (delay: number) => {
+  const setCanvasToImgwithDelay = async (delay: number) => {
     if (lastRequest) {
       clearTimeout(lastRequest);
     }
-    lastRequest = setTimeout(() => {
+    lastRequest = setTimeout(async () => {
       dispatch(setCanvas([]));
-      const canvasImages: string[] = csv.value.map((name) =>
-        canvasRef.current ? canvasRef.current.toDataURL("image/png") : ""
+      const canvasImages = await Promise.all(
+        csv.value.map(async (name) => {
+          try {
+            const canvas = document.createElement("canvas");
+            return await Canvas.generateCanvasImageUrl(
+              canvas,
+              Images.init(imageUrl),
+              font.value,
+              text.value,
+              name
+            );
+          } catch (error) {
+            throw error;
+          }
+        })
       );
-      // const canvasImage = canvasRef.current?.toDataURL("image/png");
       dispatch(setCanvas(canvasImages));
     }, delay);
   };
@@ -90,11 +102,6 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     return () => window.removeEventListener("keydown", keyDownHandler);
   }, [flag]);
 
-  React.useEffect(() => {
-    console.log(scale);
-    container.current?.getContext("2d")?.scale(scale, scale);
-  }, [scale]);
-
   React.useMemo(() => {
     setCanvasToImgwithDelay(1000);
   }, [trigger]);
@@ -105,18 +112,26 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       width={"500px"}
       borderWidth={2}
       borderColor={"black"}
-      overflow={"clip"}
+      overflow={"scroll"}
       order={{ base: 1, md: 2 }}
       onMouseEnter={setFlag.on}
       height={"full"}
-      display={"flex"}
       position={"relative"}
-      justifyContent={"center"}
-      alignContent={"center"}
+      // display={"flex"}
+      // justifyContent={"center"}
+      // alignContent={"center"}
       onMouseLeave={setFlag.off}
     >
-      {/* <canvas id="bound-target" ref={container}> */}
-      <Box id="canvas-parent" position="relative" overflow={"clip"}>
+      <Box
+        transform={"scale(1)"}
+        ref={container}
+        id="canvas-parent"
+        position="relative"
+        // display={"flex"}
+        width={"content-fit"}
+        height={"content-fit"}
+        borderWidth={"10px"}
+      >
         <DraggableText
           bounds="#canvas-parent"
           longestName={getLongestNameWidth(csv.value)}
@@ -124,14 +139,6 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         />
         <canvas ref={canvasRef} />
       </Box>
-      {/* </canvas> */}
-
-      {/* <Box transform={`scale(${scale})`} ref={container}>
-        <canvas ref={canvasRef}>adasd</canvas>
-      </Box> */}
-      {/* <a href="#" onClick={download}>
-        download
-      </a> */}
     </Box>
   );
 };

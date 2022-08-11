@@ -24,7 +24,11 @@ canvas {
   width: 10px;
   height: 10px;
 }
-
+.preview-download {
+  object-fit: contain;
+  height: 100%;
+  width: 100%;
+}
 /* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f188;

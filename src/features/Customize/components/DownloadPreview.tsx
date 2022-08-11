@@ -11,7 +11,17 @@ const DownloadPreview: React.FC = () => {
       <Text marginBottom={4} color={"gray.500"}>
         Download Preview
       </Text>
-      <img src={canvas.value[selectedIndex.value]} loading="lazy" />
+      <Box width={"full"} height={"120px"} background={"gray.100"} padding={2}>
+        {!canvas.value[selectedIndex.value] ? (
+          "loading.."
+        ) : (
+          <img
+            className="preview-download"
+            src={canvas.value[selectedIndex.value]}
+            loading="lazy"
+          />
+        )}
+      </Box>
     </Box>
   );
 };

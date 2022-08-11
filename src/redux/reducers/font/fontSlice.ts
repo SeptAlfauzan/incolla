@@ -12,7 +12,7 @@ const initialState: State = {
   value: {
     family: "Poppins",
     url: "/src/assets/fonts/poppins.ttf",
-    size: 14,
+    size: 100,
   },
 };
 

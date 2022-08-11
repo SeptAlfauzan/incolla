@@ -26,13 +26,14 @@ export const downloadAll = (
     const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
     const zip = new JSZip();
 
-    // canvasImagesData.map((imageURL: string, i: number) => {
-    // });
-    zip.file(
-      `${1}-image.png`,
-      canvasImagesData[0].replace(/^data:image\/(png|jpg);base64,/, ""),
-      { binary: true }
-    );
+    canvasImagesData.map((imageURL: string, i: number) => {
+      zip.file(
+        `image-${i}.png`,
+        imageURL.replace(/^data:image\/(png|jpg);base64,/, ""),
+        { base64: true }
+      );
+    });
+
     zip.generateAsync({ type: "blob" }).then(function (content) {
       saveAs(content, "test.zip");
     });

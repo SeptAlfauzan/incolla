@@ -16,9 +16,16 @@ interface Props {
 const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
   const width = useAppSelector((state) => state.text.value.width);
   const textRef = React.useRef<HTMLParagraphElement | null>(null);
+  const draggableRef = React.useRef<Draggable | null>(null);
+
   const dispatch = useAppDispatch();
   const text = useAppSelector((state) => state.text);
   const font = useAppSelector((state) => state.font);
+
+  const handleOnMouseDown = (e: MouseEvent) => {
+    e as MouseEvent;
+    console.log(e, e.clientY);
+  };
   const handleStopDrag = (e: DraggableEvent, data: DraggableData) => {
     dispatch(setTextPosition({ x: data.x, y: data.y }));
   };
@@ -39,7 +46,9 @@ const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
 
   return (
     <Draggable
+      ref={draggableRef}
       handle=".handle"
+      onMouseDown={handleOnMouseDown}
       onStop={handleStopDrag}
       defaultPosition={{ x: text.value.position.x, y: text.value.position.y }}
       scale={1}

@@ -1,16 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Position, Text } from "../../../interfaces/text";
 
-interface Position {
-  x: number;
-  y: number;
-}
 interface State {
-  value: {
-    position: Position;
-    color: string;
-    align: "center" | "left" | "right";
-    width: number;
-  };
+  value: Text;
 }
 
 const initialState: State = {
