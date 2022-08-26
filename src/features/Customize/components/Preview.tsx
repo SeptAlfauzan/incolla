@@ -9,6 +9,7 @@ interface Props {}
 const Preview: React.FC<Props> = () => {
   const [flag, setFlag] = useBoolean();
   const _csv = useAppSelector((state) => state.csv.value);
+  const _image = useAppSelector((state) => state.image.value);
   const dispatch = useAppDispatch();
 
   const handleClick = (i: number) => {
@@ -21,8 +22,8 @@ const Preview: React.FC<Props> = () => {
 
   return (
     <Box
-      width={{ base: "full", md: "200px" }}
-      height={{ base: flag ? "25%" : "0", md: "full" }}
+      width={{ base: "100%", md: "200px" }}
+      height={{ base: "25%", md: "full" }}
       backgroundColor={"#ffffff"}
       transition={"all"}
       transitionDuration={"200ms"}
@@ -30,18 +31,35 @@ const Preview: React.FC<Props> = () => {
       flexDirection={"column"}
       gap={"10px"}
       paddingTop={flag ? "20px" : 0}
-      position={"relative"}
+      bottom={0}
+      zIndex={"100"}
+      transform={"auto"}
+      translateY={{ base: flag ? 0 : "25vh", md: 0 }}
+      position={{ base: "absolute", md: "relative" }}
       order={{ base: "3", md: "1" }}
     >
+      <Text
+        textAlign={"center"}
+        fontSize={18}
+        display={{ base: "none", md: "block" }}
+      >
+        Preview
+      </Text>
       <Button
+        zIndex={"100"}
+        display={{ base: "block", md: "none" }}
         onClick={setFlag.toggle}
-        position={{ base: "absolute", md: "relative" }}
-        top={{ base: "-35px", md: 0 }}
+        position={{ base: "fixed", md: "relative" }}
+        bottom={{ base: "100px", md: 0 }}
         fontSize={18}
         color={"blackAlpha.700"}
         paddingX={"8px"}
+        top={"-10"}
+        left={5}
+        borderWidth={"1px 1px 0 1px"}
+        borderColor={"blackAlpha.700"}
+        borderRadius={"10px 10px 0 0"}
         backgroundColor={"white"}
-        _hover={{ backgroundColor: "twitter.600", color: "#ffffff" }}
       >
         Preview
       </Button>
@@ -59,7 +77,9 @@ const Preview: React.FC<Props> = () => {
         {_csv.map((data: string, i: number) => (
           <Box key={data + i} display={"flex"} width={"full"}>
             <Text>{i + 1}</Text>
-            <Card onClick={() => handleClick(i)}>{data}</Card>
+            <Card label={data} onClick={() => handleClick(i)}>
+              <img className="preview-download" src={_image} loading="lazy" />
+            </Card>
           </Box>
         ))}
       </Box>

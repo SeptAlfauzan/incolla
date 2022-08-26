@@ -1,3 +1,4 @@
+import imageCompression from "browser-image-compression";
 import { Font } from "../../../interfaces/font";
 import { Text } from "../../../interfaces/text";
 import Images from "./image";
@@ -61,7 +62,7 @@ class Canvas {
     return new Promise((resolve, reject) => {
       const ctx: CanvasRenderingContext2D | undefined | null =
         canvas.getContext("2d");
-      bgImage.onload = function () {
+      bgImage.onload = async function () {
         canvas && ctx?.clearRect(0, 0, canvas.width, canvas.height); //clear previous canvas
 
         canvas && Canvas.resizeAsTarget(canvas, bgImage.width, bgImage.height);
@@ -75,6 +76,27 @@ class Canvas {
         ctx
           ? ctx.fillText(name, text.position.x, text.position.y + font.size)
           : null;
+
+        // const imageBlob: any = await new Promise((resolve, reject) =>
+        //   canvas.toBlob((blob) => {
+        //     try {
+        //       resolve(blob);
+        //     } catch (error) {
+        //       reject(error);
+        //     }
+        //   })
+        // );
+        // const compressionOptions = {
+        //   maxSizeMB: 1,
+        //   useWebWorker: true,
+        // };
+        // const compressedImage = await imageCompression(
+        //   imageBlob,
+        //   compressionOptions
+        // );
+        // const imageDataUrl: string = await Images.blobToDataUrl(
+        //   compressedImage
+        // );
         resolve(canvas.toDataURL("image/png"));
       };
       bgImage.onerror = function (error) {

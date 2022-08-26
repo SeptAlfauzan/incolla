@@ -1,4 +1,5 @@
-import { Box, Button, Link, Text } from "@chakra-ui/react";
+import { Box, Button, Link, Text, useBoolean } from "@chakra-ui/react";
+import html2canvas from "html2canvas";
 import React from "react";
 import { useAppSelector } from "../../../redux/hooks";
 import { download, downloadAll } from "../utils/download";
@@ -10,22 +11,29 @@ import TextColor from "./TextColor";
 interface Props {}
 
 const Setting: React.FC<Props> = () => {
+  const [minimize, setMinimize] = useBoolean(true);
   const font = useAppSelector((state) => state.font);
   const canvas = useAppSelector((state) => state.canvas);
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
 
-  // React.useEffect(() => {
-  //   alert(selectedIndex.value);
-  // }, [canvas.value]);
-  const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) =>
+  const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
     download(event, canvas.value[selectedIndex.value]);
+  };
 
   const handleDownloadAll = (event: React.MouseEvent<HTMLAnchorElement>) =>
     downloadAll(event, canvas.value);
   return (
     <Box
-      height={{ base: "75%", md: "full" }}
-      backgroundColor={"whiteAlpha.800"}
+      position={{ base: "absolute", md: "relative" }}
+      top={0}
+      right={0}
+      zIndex={"10"}
+      transform={"auto"}
+      translateX={{ base: minimize ? "100%" : "0", md: 0 }}
+      transition={"all"}
+      transitionDuration={"200ms"}
+      height={"full"}
+      backgroundColor={"#ffffff"}
       width={{ base: "200px", md: "300px" }}
       display={"flex"}
       gap={"15px"}
@@ -35,6 +43,25 @@ const Setting: React.FC<Props> = () => {
       paddingX={"18px"}
       paddingY={"28px"}
     >
+      <Button
+        borderWidth={"1px 1px 0 1px"}
+        borderColor={"blackAlpha.700"}
+        backgroundColor={"#ffffff"}
+        borderRadius={"10px 10px 0 0"}
+        transform={"auto"}
+        rotate={"-90deg"}
+        transitionDuration={"100ms"}
+        transition={"all"}
+        position={"fixed"}
+        left={minimize ? "-154px" : "-65px"}
+        top={"50vh"}
+        _focus={{ boxShadow: "none", outline: "none" }}
+        onClick={setMinimize.toggle}
+        display={{ base: "block", md: "none" }}
+      >
+        Settings
+      </Button>
+
       <Text>Settings</Text>
       <Box>
         <Text fontSize={14} marginBottom={5}>
@@ -64,10 +91,7 @@ const Setting: React.FC<Props> = () => {
           textAlign={"center"}
           onClick={handleDownload}
         >
-          {/* <Button
-        > */}
           Download
-          {/* </Button> */}
         </Link>
         <Link
           borderWidth={"4px"}

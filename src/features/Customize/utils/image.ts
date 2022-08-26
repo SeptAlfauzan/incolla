@@ -5,6 +5,13 @@ class Images {
     bgImage.crossOrigin = "anonymous";
     return bgImage;
   };
+  static blobToDataUrl = (blob: Blob) => {
+    return new Promise((r) => {
+      let fr = new FileReader();
+      fr.onload = r;
+      fr.readAsDataURL(blob);
+    }).then((e: any) => e.target.result);
+  };
 }
 
 export default Images;

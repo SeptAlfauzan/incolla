@@ -11,9 +11,15 @@ interface Props {
   bounds: string;
   label: string;
   longestName: string;
+  disabled: boolean;
 }
 
-const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
+const DraggableText: React.FC<Props> = ({
+  bounds,
+  label,
+  longestName,
+  disabled,
+}) => {
   const width = useAppSelector((state) => state.text.value.width);
   const textRef = React.useRef<HTMLParagraphElement | null>(null);
   const draggableRef = React.useRef<Draggable | null>(null);
@@ -21,12 +27,13 @@ const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
   const dispatch = useAppDispatch();
   const text = useAppSelector((state) => state.text);
   const font = useAppSelector((state) => state.font);
+  const [hidden, setHidden] = React.useState<boolean>(true);
 
   const handleOnMouseDown = (e: MouseEvent) => {
     e as MouseEvent;
-    console.log(e, e.clientY);
   };
   const handleStopDrag = (e: DraggableEvent, data: DraggableData) => {
+    setHidden(true);
     dispatch(setTextPosition({ x: data.x, y: data.y }));
   };
 
@@ -46,6 +53,8 @@ const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
 
   return (
     <Draggable
+      disabled={disabled}
+      onDrag={() => setHidden(false)}
       ref={draggableRef}
       handle=".handle"
       onMouseDown={handleOnMouseDown}
@@ -56,16 +65,18 @@ const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
     >
       <Box
         position={"absolute"}
+        zIndex={10}
         display={"flex"}
         width={width}
         justifyContent={"start"}
-        cursor={"move"}
+        cursor={disabled ? "not-allowed" : "move"}
         borderWidth={2}
         borderColor={"gray.400"}
         borderStyle={"dashed"}
         className="handle"
       >
         <Text
+          opacity={hidden ? 0 : 1}
           ref={textRef}
           padding={0}
           fontFamily={"Poppins"}
@@ -73,7 +84,7 @@ const DraggableText: React.FC<Props> = ({ bounds, label, longestName }) => {
           textOverflow={"clip"}
           height={"fit-content"}
           wordBreak={"keep-all"}
-          color={"red.400"}
+          color={"black"}
         >
           {label}
         </Text>

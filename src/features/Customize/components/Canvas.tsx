@@ -26,6 +26,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const container = React.useRef<HTMLDivElement>(null);
   const [flag, setFlag] = useBoolean();
+  const [disableEdit, setDisableEdit] = useBoolean(false);
   const [scale, setScale] = React.useState<number>(1);
   const [trigger, setTrigger] = React.useState<boolean>();
 
@@ -49,9 +50,11 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     }
     lastRequest = setTimeout(async () => {
       dispatch(setCanvas([]));
+      setDisableEdit.on;
       const canvasImages = await Promise.all(
-        csv.value.map(async (name) => {
+        csv.value.map(async (name: string, index: number) => {
           try {
+            // if (index !== selectedIndex.value) return "";
             const canvas = document.createElement("canvas");
             return await Canvas.generateCanvasImageUrl(
               canvas,
@@ -66,6 +69,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         })
       );
       dispatch(setCanvas(canvasImages));
+      setDisableEdit.off;
     }, delay);
   };
 
@@ -103,7 +107,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   }, [flag]);
 
   React.useMemo(() => {
-    setCanvasToImgwithDelay(1000);
+    setCanvasToImgwithDelay(700);
   }, [trigger]);
 
   return (
@@ -133,6 +137,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         borderWidth={"10px"}
       >
         <DraggableText
+          disabled={false}
           bounds="#canvas-parent"
           longestName={getLongestNameWidth(csv.value)}
           label={csv.value[selectedIndex.value]}

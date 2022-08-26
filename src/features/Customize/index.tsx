@@ -20,20 +20,21 @@ const Customize: React.FC<Props> = () => {
   return (
     <Box
       display={"flex"}
-      width={"full"}
-      borderWidth={"2px"}
+      width={"100vw"}
       height={"100vh"}
       backgroundColor={"gray.100"}
       justifyContent={"center"}
       alignItems={"center"}
+      overflow={"hidden"}
       flexWrap={"wrap"}
+      position={"relative"}
     >
-      <Helmet>
+      {/* <Helmet>
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
         />
-      </Helmet>
+      </Helmet> */}
       <Preview />
       <CanvasElement imageUrl={_image} />
 

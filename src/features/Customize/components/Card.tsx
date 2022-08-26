@@ -2,12 +2,19 @@ import { Box, Text } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 interface Props {
   children: ReactNode;
+  label: string;
   onClick: () => void;
 }
-const Card: React.FC<Props> = ({ children, onClick }) => {
+const Card: React.FC<Props> = ({ children, label, onClick }) => {
   return (
-    <Box width={"full"}>
+    <Box
+      width={"full"}
+      display={"flex"}
+      flexDirection={"column"}
+      marginLeft={"10px"}
+    >
       <Box
+        order={{ base: 2, md: 1 }}
         cursor={"pointer"}
         onClick={onClick}
         width={{ base: "200px", md: "full" }}
@@ -22,8 +29,12 @@ const Card: React.FC<Props> = ({ children, onClick }) => {
       >
         {children}
       </Box>
-      <Text fontSize={"12px"} color={"blackAlpha.600"}>
-        {children}
+      <Text
+        order={{ base: 1, md: 2 }}
+        color={"blackAlpha.600"}
+        marginBottom={"10px"}
+      >
+        {label}
       </Text>
     </Box>
   );
