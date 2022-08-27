@@ -31,6 +31,7 @@ const Preview: React.FC<Props> = () => {
       flexDirection={"column"}
       gap={"10px"}
       paddingTop={flag ? "20px" : 0}
+      paddingX={"20px"}
       bottom={0}
       zIndex={"100"}
       transform={"auto"}
@@ -39,7 +40,7 @@ const Preview: React.FC<Props> = () => {
       order={{ base: "3", md: "1" }}
     >
       <Text
-        textAlign={"center"}
+        textAlign={"start"}
         fontSize={18}
         display={{ base: "none", md: "block" }}
       >

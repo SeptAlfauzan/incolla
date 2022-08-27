@@ -6,6 +6,7 @@ import Setting from "./components/Setting";
 import { Helmet } from "react-helmet";
 import { useAppSelector } from "../../redux/hooks";
 import NoData from "./components/NoData";
+import Navbar from "./components/Navbar";
 
 interface Props {}
 
@@ -29,6 +30,7 @@ const Customize: React.FC<Props> = () => {
       flexWrap={"wrap"}
       position={"relative"}
     >
+      <Navbar />
       {/* <Helmet>
         <meta
           name="viewport"

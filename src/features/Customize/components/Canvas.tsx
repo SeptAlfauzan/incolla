@@ -1,4 +1,10 @@
-import { background, Box, position, useBoolean } from "@chakra-ui/react";
+import {
+  background,
+  Box,
+  Button,
+  position,
+  useBoolean,
+} from "@chakra-ui/react";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
@@ -11,6 +17,9 @@ const PLUS_CODE = 187;
 const MINUS_CODE = 189;
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.3;
+
+const SCALE_MULTIPLIER = 0.1;
+
 let lastRequest: null | NodeJS.Timeout = null;
 
 interface Props {
@@ -80,6 +89,8 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     const bgImage: HTMLImageElement = Images.init(imageUrl);
 
     bgImage.onload = function () {
+      ctx?.scale(scale, scale);
+
       canvasRef.current &&
         ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); //clear previous canvas
 
@@ -99,7 +110,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         : null;
     };
     setTrigger(!trigger);
-  }, [text.value, font.value.size, selectedIndex.value]);
+  }, [text.value, font.value.size, selectedIndex.value, scale]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -110,40 +121,54 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     setCanvasToImgwithDelay(700);
   }, [trigger]);
 
+  const handleScaleUp = () => {
+    setScale((prev) => prev + SCALE_MULTIPLIER);
+  };
+
   return (
     <Box
       flexGrow={1}
       width={"500px"}
-      borderWidth={2}
-      borderColor={"black"}
+      // borderWidth={2}
+      // borderColor={"black"}
       overflow={"scroll"}
       order={{ base: 1, md: 2 }}
       onMouseEnter={setFlag.on}
       height={"full"}
       position={"relative"}
-      // display={"flex"}
-      // justifyContent={"center"}
-      // alignContent={"center"}
       onMouseLeave={setFlag.off}
     >
       <Box
-        transform={"scale(1)"}
-        ref={container}
-        id="canvas-parent"
-        position="relative"
-        // display={"flex"}
-        width={"content-fit"}
-        height={"content-fit"}
-        borderWidth={"10px"}
+        position={"fixed"}
+        zIndex={100}
+        display={"flex"}
+        gap={"5px"}
+        margin={"10px"}
+        flexDirection={"column"}
       >
-        <DraggableText
-          disabled={false}
-          bounds="#canvas-parent"
-          longestName={getLongestNameWidth(csv.value)}
-          label={csv.value[selectedIndex.value]}
-        />
-        <canvas ref={canvasRef} />
+        <Button
+          backgroundColor={"white"}
+          border={"1px"}
+          borderColor={"blackAlpha.300"}
+          onClick={handleScaleUp}
+        >
+          +
+        </Button>
+        <Button
+          backgroundColor={"white"}
+          border={"1px"}
+          borderColor={"blackAlpha.300"}
+        >
+          -
+        </Button>
       </Box>
+      <DraggableText
+        disabled={false}
+        bounds="#canvas-parent"
+        longestName={getLongestNameWidth(csv.value)}
+        label={csv.value[selectedIndex.value]}
+      />
+      <canvas ref={canvasRef} id={"canvas-parent"} />
     </Box>
   );
 };
