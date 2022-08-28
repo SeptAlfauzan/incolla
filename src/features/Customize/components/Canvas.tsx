@@ -6,11 +6,16 @@ import {
   position,
   useBoolean,
 } from "@chakra-ui/react";
+import { display } from "html2canvas/dist/types/css/property-descriptors/display";
 import Konva from "konva";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
-import { setWidth } from "../../../redux/reducers/text/textSlice";
+import {
+  setTextPosition,
+  setWidth,
+} from "../../../redux/reducers/text/textSlice";
+import { useKonvaCanvas } from "../hooks/useKonvaCanvas";
 import CanvasKonva from "../libs/konva";
 import { getLongestNameWidth } from "../utils/csv";
 import Canvas from "./../utils/canvas";
@@ -35,12 +40,13 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const csv = useAppSelector((state) => state.csv);
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
   const dispatch = useAppDispatch();
-  const [konva, setKonva] = React.useState<CanvasKonva>();
   const [flag, setFlag] = useBoolean();
   const [disableEdit, setDisableEdit] = useBoolean(false);
   const [scale, setScale] = React.useState<number>(1.0);
   const [trigger, setTrigger] = React.useState<boolean>();
   const width = useAppSelector((state) => state.text.value.width);
+
+  const [konva, setKonva] = useKonvaCanvas(imageUrl, "#canvas-parent");
 
   React.useEffect(() => {
     const text = getLongestNameWidth(csv.value);
@@ -49,12 +55,6 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     );
   }, [font.value]);
 
-  React.useEffect(() => {
-    const newCanvas = new CanvasKonva("lorem", "no image", "#canvas-parent");
-    setKonva(newCanvas);
-  }, []);
-
-  console.log(width);
   const keyDownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && (e.keyCode === 187 || e.keyCode === 189) && !flag) {
       e.preventDefault();
@@ -79,6 +79,21 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       const canvasImages = await Promise.all(
         csv.value.map(async (name: string, index: number) => {
           try {
+            //  const newKonvaLayer = new Konva.Layer();
+            //  newKonvaLayer.add(imageLayer);
+            //  const newKonvaText = new Konva.Text({
+            //    x: text.value.position.x,
+            //    y: text.value.position.y,
+            //    text: "text",
+            //    fontFamily: "Calibry",
+            //    fontSize: font.value.size,
+            //    width: width,
+            //    fill: text.value.color,
+            //    align: text.value.align,
+            //    position: text.value.position,
+            //  });
+            //  newKonvaLayer.add(newKonvaText);
+            //  console.log(newKonvaLayer.toDataURL());
             // if (index !== selectedIndex.value) return "";
             const canvas = document.createElement("canvas");
             return await Canvas.generateCanvasImageUrl(
@@ -99,9 +114,8 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   };
 
   React.useEffect(() => {
+    if (!konva) return;
     const bgImage: HTMLImageElement = Images.init(imageUrl);
-    const newCanvas = new CanvasKonva("lorem", "no image", "#canvas-parent");
-
     bgImage.onload = function () {
       const imageLayer = new Konva.Image({
         x: 0,
@@ -110,69 +124,23 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         width: bgImage.width,
         height: bgImage.height,
       });
-      newCanvas.layer.add(imageLayer);
-      newCanvas.addText(
+
+      konva.stage.setSize({ width: bgImage.width, height: bgImage.height });
+      konva.layer.clear();
+      konva.layer.add(imageLayer);
+      konva.addText(
         csv.value[selectedIndex.value],
         "Calibry",
         font.value.size,
-        "black",
+        text.value.color,
         width,
-        text.value.align
+        text.value.align,
+        text.value.position
       );
+      // konva.generateImageUrl("test", bgImage.sizes);
     };
-    setTrigger(!trigger);
-  }, [text.value, font.value.size, selectedIndex.value, imageUrl]);
-
-  // React.useEffect(() => {
-  //   const ctx: CanvasRenderingContext2D | undefined | null =
-  //     canvasRef.current?.getContext("2d");
-
-  //   const bgImage: HTMLImageElement = Images.init(imageUrl);
-
-  //   const box = new Konva.Rect({
-  //     x: 50,
-  //     y: 50,
-  //     width: 10,
-  //     height: 50,
-  //     fill: "#00D2FF",
-  //     stroke: "black",
-  //     strokeWidth: 4,
-  //     draggable: true,
-  //   });
-
-  //   const newCanvas = new CanvasKonva("lorem", "no image", "#canvas-parent");
-  //   newCanvas.layer.add(box);
-
-  //   bgImage.onload = function () {
-  //     const imageLayer = new Konva.Image({
-  //       x: 0,
-  //       y: 0,
-  //       image: bgImage,
-  //       width: bgImage.width,
-  //       height: bgImage.height,
-  //     });
-  //     newCanvas.layer.add(imageLayer);
-  //     // newCanvas.addImage(bgImage);
-  //     // canvasRef.current &&
-  //     //   ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); //clear previous canvas
-  //     // ctx?.save();
-  //     // console.log(scale);
-  //     // canvasRef.current &&
-  //     //   Canvas.resizeAsTarget(canvasRef.current, bgImage.width, bgImage.height);
-  //     // ctx ? ctx.drawImage(bgImage, 0, 0, bgImage.width, bgImage.height) : null; //add image to canvas
-  //     // // SET CUSTOM FONT
-  //     // ctx ? (ctx.font = `${font.value.size}px Poppins`) : null;
-  //     // ctx ? (ctx.fillStyle = text.value.color) : null;
-  //     // ctx
-  //     //   ? ctx.fillText(
-  //     //       csv.value[selectedIndex.value],
-  //     //       text.value.position.x,
-  //     //       text.value.position.y + font.value.size
-  //     //     )
-  //     //   : null;
-  //   };
-  //   setTrigger(!trigger);
-  // }, [text.value, font.value.size, selectedIndex.value]);
+    // setTrigger(!trigger);
+  }, [text.value, selectedIndex.value, konva]);
 
   React.useEffect(() => {
     window.addEventListener("keydown", keyDownHandler);
@@ -235,14 +203,9 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         id="canvas-parent"
         borderWidth={"1px"}
         borderColor={"pink.400"}
+        zIndex={100}
       />
-      {/* <DraggableText
-        disabled={false}
-        bounds="#canvas-parent"
-        longestName={getLongestNameWidth(csv.value)}
-        label={csv.value[selectedIndex.value]}
-      /> */}
-      {/* <canvas ref={canvasRef} id={"canvas-parent"} /> */}
+      <Box id="tempParent" display={"none"} zIndex={-100} />
     </Box>
   );
 };

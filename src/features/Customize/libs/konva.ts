@@ -1,22 +1,25 @@
+import { PayloadAction } from "@reduxjs/toolkit";
 import Konva from "konva";
 import { Layer } from "konva/lib/Layer";
 import { Image } from "konva/lib/shapes/Image";
 import { Text } from "konva/lib/shapes/Text";
 import { Stage } from "konva/lib/Stage";
+import { Font } from "../../../interfaces/font";
+import { Position, Text as TextState } from "../../../interfaces/text";
 import { useAppSelector } from "../../../redux/hooks";
 
 export default class CanvasKonva {
-  text: string;
-  image: string;
   parentContainerId: string;
   stage: Stage;
   layer: Layer;
   textLayer: Text | null;
+  image: HTMLImageElement | null;
+  dispatch?: (arg: any) => void;
+  setPosition?: (payload: Position) => void;
 
-  constructor(text: string, image: string, parentContainerId: string) {
-    this.text = text;
-    this.image = image;
+  constructor(image: HTMLImageElement, parentContainerId: string) {
     this.parentContainerId = parentContainerId;
+    this.image = image;
 
     this.stage = new Konva.Stage({
       container: this.parentContainerId,
@@ -25,12 +28,13 @@ export default class CanvasKonva {
     });
 
     this.layer = new Konva.Layer();
-    this.textLayer = null;
     this.stage.add(this.layer);
+    this.textLayer = null;
   }
 
   addImage(img: HTMLImageElement, x: number = 0, y: number = 0) {
     img.onload = () => {
+      this.image = img;
       const imageLayer = new Konva.Image({
         x: 100,
         y: 100,
@@ -49,6 +53,7 @@ export default class CanvasKonva {
     fill: string,
     MIN_WIDTH: number,
     align: string,
+    position: Position,
     onDragEvent?: (...arg: any) => void
   ) {
     const simpleText = new Konva.Text({
@@ -60,12 +65,14 @@ export default class CanvasKonva {
       width: MIN_WIDTH,
       fill,
       align,
+      position,
       draggable: true,
     });
     this.layer.add(simpleText);
     var tr = new Konva.Transformer({
       nodes: [simpleText],
       padding: 5,
+      rotateEnabled: false,
       // enable only side anchors
       enabledAnchors: ["middle-left", "middle-right"],
       // limit transformer size
@@ -88,7 +95,24 @@ export default class CanvasKonva {
       });
     });
 
+    simpleText.on("dragend", () => {
+      const position: Position = {
+        x: simpleText.position().x,
+        y: simpleText.position().y,
+      };
+      if (this.dispatch && this.setPosition) {
+        this.dispatch(this.setPosition(position));
+      }
+    });
     this.textLayer = simpleText;
+  }
+
+  onTextEndMove(
+    dispatch: (arg: any) => void,
+    setPosition: (payload: Position) => void
+  ) {
+    this.dispatch = dispatch;
+    this.setPosition = setPosition;
   }
 
   static getTextWidth(text: string, fontSize: number, fontFamily: string) {
@@ -98,5 +122,21 @@ export default class CanvasKonva {
       fontSize,
     });
     return txt.width();
+  }
+
+  generateImageUrl(
+    name: string,
+    size: {
+      height: number;
+      width: number;
+    }
+  ) {
+    const stage = new Konva.Stage({
+      container: document.createElement("div"),
+      size,
+    });
+    stage.add(this.layer);
+    return stage.toDataURL();
+    // stage.add(imageLayer);
   }
 }
