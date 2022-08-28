@@ -1,12 +1,18 @@
 import { Box, Button, Link, Text, useBoolean } from "@chakra-ui/react";
-import html2canvas from "html2canvas";
 import React from "react";
-import { useAppSelector } from "../../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { download, downloadAll } from "../utils/download";
 import DownloadPreview from "./DownloadPreview";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
 import TextColor from "./TextColor";
+import {
+  AiOutlineAlignLeft,
+  AiOutlineAlignCenter,
+  AiOutlineAlignRight,
+} from "react-icons/ai";
+import ButtonIcon from "./ButtonIcon";
+import { setAlign } from "../../../redux/reducers/text/textSlice";
 
 interface Props {}
 
@@ -15,6 +21,7 @@ const Setting: React.FC<Props> = () => {
   const font = useAppSelector((state) => state.font);
   const canvas = useAppSelector((state) => state.canvas);
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
+  const dispatch = useAppDispatch();
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
     download(event, canvas.value[selectedIndex.value]);
@@ -67,9 +74,22 @@ const Setting: React.FC<Props> = () => {
         <Text fontSize={14} marginBottom={5}>
           Text
         </Text>
-        <Box display={"flex"} gap={2}>
-          <FontSelector />
-          <FontSize />
+        <Box display={"flex"} flexWrap={"wrap"} gap={2}>
+          <Box width={"100px"} display={"flex"} gap={2}>
+            <ButtonIcon handleClick={() => dispatch(setAlign("left"))}>
+              <AiOutlineAlignLeft />
+            </ButtonIcon>
+            <ButtonIcon handleClick={() => dispatch(setAlign("center"))}>
+              <AiOutlineAlignCenter />
+            </ButtonIcon>
+            <ButtonIcon handleClick={() => dispatch(setAlign("right"))}>
+              <AiOutlineAlignRight />
+            </ButtonIcon>
+          </Box>
+          <Box display={"flex"} gap={2}>
+            <FontSelector />
+            <FontSize />
+          </Box>
         </Box>
       </Box>
       <DownloadPreview />

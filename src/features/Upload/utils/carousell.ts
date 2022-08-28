@@ -7,7 +7,6 @@ export class Carousell {
     action: React.Dispatch<React.SetStateAction<number>>
   ) => {
     if (active == length - 1) {
-      console.log("RESET");
       return action(0);
     }
     action((prev) => prev + 1);

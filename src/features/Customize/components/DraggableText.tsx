@@ -65,7 +65,7 @@ const DraggableText: React.FC<Props> = ({
     >
       <Box
         position={"absolute"}
-        zIndex={10}
+        zIndex={300}
         display={"flex"}
         width={width}
         justifyContent={"start"}

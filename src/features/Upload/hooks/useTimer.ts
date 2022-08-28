@@ -5,7 +5,6 @@ export const useTimer = (test: () => void, duration: number) => {
 
   const timer = setInterval(() => {
     test();
-    console.log("test carousell");
   }, duration);
 
   return [timer] as const;
