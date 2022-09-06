@@ -28,11 +28,39 @@ export const downloadFromKonva = (
     const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
 
     canvasKonva?.transformer?.hide();
-    anchor.href = canvasKonva!.generateImageUrl("download", {
-      width: canvasKonva!.image!.width,
-      height: canvasKonva!.image!.height,
-    });
+    anchor.href = canvasKonva!.stage.toDataURL();
     anchor.download = "download_from_konva.png";
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const downloadKonvaAll = (
+  e: React.MouseEvent<HTMLAnchorElement>,
+  csvData: string[],
+  canvasKonva: CanvasKonva | null
+) => {
+  if (!(e.target instanceof HTMLAnchorElement) && canvasKonva == null)
+    return null;
+
+  try {
+    const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
+    const zip = new JSZip();
+
+    csvData.map((name: string, i: number) => {
+      canvasKonva!.textLayer!.setText(name);
+      const imageURL = canvasKonva!.stage.toDataURL();
+      zip.file(
+        `image-${i}.png`,
+        imageURL.replace(/^data:image\/(png|jpg);base64,/, ""),
+        { base64: true }
+      );
+    });
+
+    zip.generateAsync({ type: "blob" }).then(function (content) {
+      saveAs(content, "download_all_konva.zip");
+    });
+    // anchor.href = canvasImageData;
+    // anchor.download = "test.png";
   } catch (error) {
     console.log(error);
   }

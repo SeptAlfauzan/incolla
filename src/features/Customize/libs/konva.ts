@@ -38,6 +38,23 @@ export default class CanvasKonva {
     this.transformer = null;
   }
 
+  // clone(
+  //   stage: Stage,
+  //   layer: Layer,
+  //   textLayer: Text,
+  //   // image: HTMLImageElement,
+  //   transformer: Transformer
+  // ) {
+  //   // this.image = image;
+  //   this.stage = stage;
+  //   this.layer = layer;
+
+  //   this.textLayer = textLayer;
+  //   this.transformer = transformer;
+  //   this.stage.add(this.layer);
+  //   this.layer.add(this.transformer);
+  // }
+
   addImage(img: HTMLImageElement, x: number = 0, y: number = 0) {
     img.onload = () => {
       this.image = img;
@@ -119,6 +136,14 @@ export default class CanvasKonva {
       if (event.target === this.textLayer) return this.transformer?.show();
       return this.transformer?.hide();
     });
+
+    this.textLayer.on("mouseleave", () => {
+      this.stage.container().style.cursor = "default";
+    });
+
+    this.textLayer.on("mouseenter", () => {
+      this.stage.container().style.cursor = "move";
+    });
   }
 
   onTextEndMove(
@@ -138,19 +163,8 @@ export default class CanvasKonva {
     return txt.width();
   }
 
-  generateImageUrl(
-    name: string,
-    size: {
-      height: number;
-      width: number;
-    }
-  ) {
-    const stage = new Konva.Stage({
-      container: document.createElement("div"),
-      size,
-    });
-    stage.add(this.layer);
-    return stage.toDataURL();
-    // stage.add(imageLayer);
+  generateImageUrl() {
+    this.stage.add(this.layer);
+    return this.stage.toDataURL();
   }
 }

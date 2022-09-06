@@ -1,7 +1,12 @@
 import { Box, Button, Link, Text, useBoolean } from "@chakra-ui/react";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { download, downloadAll, downloadFromKonva } from "../utils/download";
+import {
+  download,
+  downloadAll,
+  downloadFromKonva,
+  downloadKonvaAll,
+} from "../utils/download";
 import DownloadPreview from "./DownloadPreview";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
@@ -20,17 +25,25 @@ const Setting: React.FC<Props> = () => {
   const [minimize, setMinimize] = useBoolean(true);
   const font = useAppSelector((state) => state.font);
   const canvas = useAppSelector((state) => state.canvas);
+  const csv = useAppSelector((state) => state.csv);
   const konva = useAppSelector((state) => state.konva);
+  const [loading, setLoading] = React.useState<boolean>(false);
+
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
   const dispatch = useAppDispatch();
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    // download(event, canvas.value[selectedIndex.value]);
+    // konva.value?.textLayer?.setText("asdasdasd");
+    setLoading(true);
     downloadFromKonva(event, konva.value);
+    setLoading(false);
   };
 
-  const handleDownloadAll = (event: React.MouseEvent<HTMLAnchorElement>) =>
-    downloadAll(event, canvas.value);
+  const handleDownloadAll = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    setLoading(true);
+    downloadKonvaAll(event, csv.value, konva.value);
+    setLoading(false);
+  };
   return (
     <Box
       position={{ base: "absolute", md: "relative" }}
@@ -113,7 +126,7 @@ const Setting: React.FC<Props> = () => {
           textAlign={"center"}
           onClick={handleDownload}
         >
-          Download
+          {loading ? "Please wait" : "Download"}
         </Link>
         <Link
           borderWidth={"4px"}
@@ -131,7 +144,7 @@ const Setting: React.FC<Props> = () => {
           textAlign={"center"}
           onClick={handleDownloadAll}
         >
-          Download All
+          {loading ? "Please wait" : "Download All"}
         </Link>
       </Box>
     </Box>

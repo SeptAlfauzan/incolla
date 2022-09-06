@@ -6,6 +6,7 @@ import canvasReducer from "./reducers/canvas/canvasSlice";
 import textReducer from "./reducers/text/textSlice";
 import selectedReducer from "./reducers/selected/selectedSlice";
 import konvaReducer from "./reducers/konva/konvaSlice";
+import previewImageReducer from "./reducers/previewImage/previewImageSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     text: textReducer,
     selectedIndex: selectedReducer,
     konva: konvaReducer,
+    previewImage: previewImageReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

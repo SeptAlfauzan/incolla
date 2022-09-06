@@ -8,11 +8,14 @@ import {
 } from "@chakra-ui/react";
 import { display } from "html2canvas/dist/types/css/property-descriptors/display";
 import Konva from "konva";
+import { Layer } from "konva/lib/Layer";
 import { Transformer } from "konva/lib/shapes/Transformer";
+import { Stage } from "konva/lib/Stage";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
 import { setKonvaObj } from "../../../redux/reducers/konva/konvaSlice";
+import { setPreviewImage } from "../../../redux/reducers/previewImage/previewImageSlice";
 import {
   setTextPosition,
   setWidth,
@@ -22,7 +25,6 @@ import CanvasKonva from "../libs/konva";
 import { getLongestNameWidth } from "../utils/csv";
 import Canvas from "./../utils/canvas";
 import Images from "./../utils/image";
-import DraggableText from "./DraggableText";
 
 const PLUS_CODE = 187;
 const MINUS_CODE = 189;
@@ -46,11 +48,12 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const dispatch = useAppDispatch();
   const [flag, setFlag] = useBoolean();
   const [disableEdit, setDisableEdit] = useBoolean(false);
-  const [scale, setScale] = React.useState<number>(1.0);
+  const [scale, setScale] = React.useState<number>(0.5);
   const [trigger, setTrigger] = React.useState<boolean>();
   const width = useAppSelector((state) => state.text.value.width);
 
   const [konva, setKonva] = useKonvaCanvas(imageUrl, "#canvas-parent");
+  const [tempKonva, setTempKonva] = useKonvaCanvas(imageUrl, "#temp"); //used for temporary canvas to for 'download all feature'
 
   React.useEffect(() => {
     const text = getLongestNameWidth(csv.value);
@@ -79,49 +82,29 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     }
     lastRequest = setTimeout(async () => {
       dispatch(setCanvas([]));
-      setDisableEdit.on;
+      // setDisableEdit.on;
       const canvasImages = await Promise.all(
         csv.value.map(async (name: string, index: number) => {
+          if (index !== selectedIndex.value) return "";
           try {
-            //  const newKonvaLayer = new Konva.Layer();
-            //  newKonvaLayer.add(imageLayer);
-            //  const newKonvaText = new Konva.Text({
-            //    x: text.value.position.x,
-            //    y: text.value.position.y,
-            //    text: "text",
-            //    fontFamily: "Calibry",
-            //    fontSize: font.value.size,
-            //    width: width,
-            //    fill: text.value.color,
-            //    align: text.value.align,
-            //    position: text.value.position,
-            //  });
-            //  newKonvaLayer.add(newKonvaText);
-            //  console.log(newKonvaLayer.toDataURL());
-            // if (index !== selectedIndex.value) return "";
-            const canvas = document.createElement("canvas");
-            return await Canvas.generateCanvasImageUrl(
-              canvas,
-              Images.init(imageUrl),
-              font.value,
-              text.value,
-              name
-            );
+            tempKonva?.textLayer?.setText(name);
+            return tempKonva?.generateImageUrl() || "";
           } catch (error) {
             throw error;
           }
         })
       );
       dispatch(setCanvas(canvasImages));
-      setDisableEdit.off;
+      // setDisableEdit.off;
     }, delay);
   };
 
   React.useEffect(() => {
     if (!konva) return;
+    if (!tempKonva) return;
+
     const bgImage: HTMLImageElement = Images.init(imageUrl);
     bgImage.onload = function () {
-      console.log("konva redux", konvaRedux.value?.layer);
       const imageLayer = new Konva.Image({
         x: 0,
         y: 0,
@@ -129,6 +112,20 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         width: bgImage.width,
         height: bgImage.height,
       });
+
+      tempKonva.stage.setSize({ width: bgImage.width, height: bgImage.height });
+      tempKonva.layer.clear();
+      tempKonva.layer.add(imageLayer.clone());
+
+      tempKonva.addText(
+        csv.value[selectedIndex.value],
+        "Calibry",
+        font.value.size,
+        text.value.color,
+        width,
+        text.value.align,
+        text.value.position
+      );
 
       konva.stage.setSize({ width: bgImage.width, height: bgImage.height });
       konva.layer.clear();
@@ -142,20 +139,12 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         text.value.align,
         text.value.position
       );
-      // konva.transformer?.hide();
-      // const newKonva: CanvasKonva = structuredClone(konva); //prevent reference value from current konva variable
-      // // Object.assign(newKonva, konva);
-      // console.log("newKonva", newKonva);
-      // dispatch(setKonvaObj(newKonva));
-      // console.log(
-      //   "url",
-      //   konva.generateImageUrl("test", {
-      //     width: bgImage.width,
-      //     height: bgImage.height,
-      //   })
-      // );
+      // konva.stage.value;
+      // const clone: Stage = konva.stage.clone();
+
+      dispatch(setKonvaObj(tempKonva));
     };
-    // setTrigger(!trigger);
+    setTrigger(!trigger);
   }, [text.value, selectedIndex.value, konva]);
 
   React.useEffect(() => {
@@ -164,7 +153,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   }, [flag]);
 
   React.useMemo(() => {
-    setCanvasToImgwithDelay(700);
+    setCanvasToImgwithDelay(1000);
   }, [trigger]);
 
   const handleScaleUp = () => {
@@ -212,6 +201,19 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
           -
         </Button>
       </Box>
+      {/* THIS USE FOR TEMPORARY IMAGE DATA, IN ORDER TO GENERATE THOSE IMAGE URLS BASED ON CSV VALUES */}
+      <Box
+        transform="auto"
+        id="temp"
+        width={"fit-content"}
+        height={"fit-content"}
+        position={"relative"}
+        borderWidth={"1px"}
+        borderColor={"green.400"}
+        display={"none"}
+        zIndex={100}
+      />
+      {/* THIS IS MAIN CANVAS CONTAINER, FOR EDITING PREVIEW'S PURPOSE */}
       <Box
         transform="auto"
         scale={scale}
@@ -223,7 +225,6 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         borderColor={"blue.400"}
         zIndex={100}
       />
-      <Box id="tempParent" display={"none"} zIndex={-100} />
     </Box>
   );
 };
