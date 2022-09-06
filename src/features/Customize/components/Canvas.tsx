@@ -127,6 +127,10 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         text.value.position
       );
 
+      konva.transformer?.setDraggable(true);
+      konva.textLayer?.setDraggable(true);
+      console.log("asdasd", konva.textLayer?.draggable());
+
       konva.stage.setSize({ width: bgImage.width, height: bgImage.height });
       konva.layer.clear();
       konva.layer.add(imageLayer);
@@ -142,6 +146,8 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
       // konva.stage.value;
       // const clone: Stage = konva.stage.clone();
 
+      console.log(konva.transformer?.draggable());
+      console.log(tempKonva.transformer?.draggable());
       dispatch(setKonvaObj(tempKonva));
     };
     setTrigger(!trigger);
@@ -211,7 +217,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         borderWidth={"1px"}
         borderColor={"green.400"}
         display={"none"}
-        zIndex={100}
+        zIndex={200}
       />
       {/* THIS IS MAIN CANVAS CONTAINER, FOR EDITING PREVIEW'S PURPOSE */}
       <Box
