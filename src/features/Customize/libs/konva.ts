@@ -112,7 +112,13 @@ export default class CanvasKonva {
         this.dispatch(this.setPosition(position));
       }
     });
+
     this.textLayer = simpleText;
+
+    this.layer.on("click", (event) => {
+      if (event.target === this.textLayer) return this.transformer?.show();
+      return this.transformer?.hide();
+    });
   }
 
   onTextEndMove(
