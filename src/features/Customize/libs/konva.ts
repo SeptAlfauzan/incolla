@@ -3,26 +3,31 @@ import Konva from "konva";
 import { Layer } from "konva/lib/Layer";
 import { Image } from "konva/lib/shapes/Image";
 import { Text } from "konva/lib/shapes/Text";
+import { Transformer } from "konva/lib/shapes/Transformer";
 import { Stage } from "konva/lib/Stage";
 import { Font } from "../../../interfaces/font";
 import { Position, Text as TextState } from "../../../interfaces/text";
 import { useAppSelector } from "../../../redux/hooks";
 
 export default class CanvasKonva {
-  parentContainerId: string;
+  parentContainerId: string | null;
   stage: Stage;
   layer: Layer;
   textLayer: Text | null;
   image: HTMLImageElement | null;
+  transformer: Transformer | null;
   dispatch?: (arg: any) => void;
   setPosition?: (payload: Position) => void;
 
-  constructor(image: HTMLImageElement, parentContainerId: string) {
+  constructor(
+    image: HTMLImageElement | null,
+    parentContainerId: string | null
+  ) {
     this.parentContainerId = parentContainerId;
     this.image = image;
 
     this.stage = new Konva.Stage({
-      container: this.parentContainerId,
+      container: this.parentContainerId || "",
       width: window.innerWidth,
       height: window.innerHeight,
     });
@@ -30,6 +35,7 @@ export default class CanvasKonva {
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
     this.textLayer = null;
+    this.transformer = null;
   }
 
   addImage(img: HTMLImageElement, x: number = 0, y: number = 0) {
@@ -83,6 +89,8 @@ export default class CanvasKonva {
         return newBox;
       },
     });
+
+    this.transformer = tr;
     this.layer.add(tr);
     simpleText.on("transform", () => {
       // with enabled anchors we can only change scaleX

@@ -1,7 +1,7 @@
 import { Box, Button, Link, Text, useBoolean } from "@chakra-ui/react";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
-import { download, downloadAll } from "../utils/download";
+import { download, downloadAll, downloadFromKonva } from "../utils/download";
 import DownloadPreview from "./DownloadPreview";
 import FontSelector from "./FontSelector";
 import FontSize from "./FontSize";
@@ -20,11 +20,13 @@ const Setting: React.FC<Props> = () => {
   const [minimize, setMinimize] = useBoolean(true);
   const font = useAppSelector((state) => state.font);
   const canvas = useAppSelector((state) => state.canvas);
+  const konva = useAppSelector((state) => state.konva);
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
   const dispatch = useAppDispatch();
 
   const handleDownload = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    download(event, canvas.value[selectedIndex.value]);
+    // download(event, canvas.value[selectedIndex.value]);
+    downloadFromKonva(event, konva.value);
   };
 
   const handleDownloadAll = (event: React.MouseEvent<HTMLAnchorElement>) =>
@@ -34,7 +36,7 @@ const Setting: React.FC<Props> = () => {
       position={{ base: "absolute", md: "relative" }}
       top={0}
       right={0}
-      zIndex={"10"}
+      zIndex={"100"}
       transform={"auto"}
       translateX={{ base: minimize ? "100%" : "0", md: 0 }}
       transition={"all"}

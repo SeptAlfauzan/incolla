@@ -8,9 +8,11 @@ import {
 } from "@chakra-ui/react";
 import { display } from "html2canvas/dist/types/css/property-descriptors/display";
 import Konva from "konva";
+import { Transformer } from "konva/lib/shapes/Transformer";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { setCanvas } from "../../../redux/reducers/canvas/canvasSlice";
+import { setKonvaObj } from "../../../redux/reducers/konva/konvaSlice";
 import {
   setTextPosition,
   setWidth,
@@ -27,7 +29,7 @@ const MINUS_CODE = 189;
 const MAX_ZOOM = 5;
 const MIN_ZOOM = 0.3;
 
-const SCALE_MULTIPLIER = 0.5;
+const SCALE_MULTIPLIER = 0.9;
 
 let lastRequest: null | NodeJS.Timeout = null;
 
@@ -39,6 +41,8 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
   const text = useAppSelector((state) => state.text);
   const csv = useAppSelector((state) => state.csv);
   const selectedIndex = useAppSelector((state) => state.selectedIndex);
+  const konvaRedux = useAppSelector((state) => state.konva);
+
   const dispatch = useAppDispatch();
   const [flag, setFlag] = useBoolean();
   const [disableEdit, setDisableEdit] = useBoolean(false);
@@ -117,6 +121,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     if (!konva) return;
     const bgImage: HTMLImageElement = Images.init(imageUrl);
     bgImage.onload = function () {
+      console.log("konva redux", konvaRedux.value?.layer);
       const imageLayer = new Konva.Image({
         x: 0,
         y: 0,
@@ -137,7 +142,18 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         text.value.align,
         text.value.position
       );
-      // konva.generateImageUrl("test", bgImage.sizes);
+      // konva.transformer?.hide();
+      // const newKonva: CanvasKonva = structuredClone(konva); //prevent reference value from current konva variable
+      // // Object.assign(newKonva, konva);
+      // console.log("newKonva", newKonva);
+      // dispatch(setKonvaObj(newKonva));
+      // console.log(
+      //   "url",
+      //   konva.generateImageUrl("test", {
+      //     width: bgImage.width,
+      //     height: bgImage.height,
+      //   })
+      // );
     };
     // setTrigger(!trigger);
   }, [text.value, selectedIndex.value, konva]);
@@ -173,7 +189,7 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
     >
       <Box
         position={"fixed"}
-        zIndex={100}
+        zIndex={200}
         display={"flex"}
         gap={"5px"}
         margin={"10px"}
@@ -197,12 +213,14 @@ const CanvasElement: React.FC<Props> = ({ imageUrl }) => {
         </Button>
       </Box>
       <Box
+        transform="auto"
+        scale={scale}
         width={"fit-content"}
         height={"fit-content"}
         position={"relative"}
         id="canvas-parent"
         borderWidth={"1px"}
-        borderColor={"pink.400"}
+        borderColor={"blue.400"}
         zIndex={100}
       />
       <Box id="tempParent" display={"none"} zIndex={-100} />

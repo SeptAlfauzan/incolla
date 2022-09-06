@@ -5,6 +5,7 @@ import fontReducer from "./reducers/font/fontSlice";
 import canvasReducer from "./reducers/canvas/canvasSlice";
 import textReducer from "./reducers/text/textSlice";
 import selectedReducer from "./reducers/selected/selectedSlice";
+import konvaReducer from "./reducers/konva/konvaSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,7 +15,12 @@ export const store = configureStore({
     canvas: canvasReducer,
     text: textReducer,
     selectedIndex: selectedReducer,
+    konva: konvaReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

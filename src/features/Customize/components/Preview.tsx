@@ -33,7 +33,7 @@ const Preview: React.FC<Props> = () => {
       paddingTop={flag ? "20px" : 0}
       paddingX={"20px"}
       bottom={0}
-      zIndex={"100"}
+      zIndex={"200"}
       transform={"auto"}
       translateY={{ base: flag ? 0 : "25vh", md: 0 }}
       position={{ base: "absolute", md: "relative" }}

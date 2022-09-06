@@ -1,5 +1,6 @@
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import CanvasKonva from "../libs/konva";
 
 export const download = (
   e: React.MouseEvent<HTMLAnchorElement>,
@@ -12,6 +13,26 @@ export const download = (
     const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
     anchor.href = canvasImageData;
     anchor.download = "test.png";
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const downloadFromKonva = (
+  e: React.MouseEvent<HTMLAnchorElement>,
+  canvasKonva: CanvasKonva | null
+) => {
+  if (!(e.target instanceof HTMLAnchorElement) && canvasKonva == null)
+    return null;
+
+  try {
+    const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
+
+    canvasKonva?.transformer?.hide();
+    anchor.href = canvasKonva!.generateImageUrl("download", {
+      width: canvasKonva!.image!.width,
+      height: canvasKonva!.image!.height,
+    });
+    anchor.download = "download_from_konva.png";
   } catch (error) {
     console.log(error);
   }
