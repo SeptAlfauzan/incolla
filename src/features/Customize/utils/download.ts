@@ -46,6 +46,8 @@ export const downloadKonvaAll = (
     const anchor: HTMLAnchorElement = e.target as HTMLAnchorElement;
     const zip = new JSZip();
 
+    canvasKonva?.transformer?.hide();
+
     csvData.map((name: string, i: number) => {
       canvasKonva!.textLayer!.setText(name);
       const imageURL = canvasKonva!.stage.toDataURL();
