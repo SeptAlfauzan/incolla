@@ -4,8 +4,9 @@ interface Props {
   children: ReactNode;
   label: string;
   onClick: () => void;
+  isActive?: boolean;
 }
-const Card: React.FC<Props> = ({ children, label, onClick }) => {
+const Card: React.FC<Props> = ({ children, label, onClick, isActive }) => {
   return (
     <Box
       width={"full"}
@@ -20,7 +21,8 @@ const Card: React.FC<Props> = ({ children, label, onClick }) => {
         width={{ base: "200px", md: "full" }}
         flex={"none"}
         height={{ base: "full", md: "100px" }}
-        borderWidth={"1px"}
+        borderWidth={isActive ? "2px" : "1px"}
+        borderColor={isActive ? "twitter.400" : "transparent"}
         display={"flex"}
         alignItems={"center"}
         justifyContent={"center"}

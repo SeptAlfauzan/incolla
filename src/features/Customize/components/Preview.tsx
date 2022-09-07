@@ -9,6 +9,7 @@ interface Props {}
 const Preview: React.FC<Props> = () => {
   const [flag, setFlag] = useBoolean();
   const _csv = useAppSelector((state) => state.csv.value);
+  const _activeIndex = useAppSelector((state) => state.selectedIndex);
   const _image = useAppSelector((state) => state.image.value);
   const dispatch = useAppDispatch();
 
@@ -78,7 +79,11 @@ const Preview: React.FC<Props> = () => {
         {_csv.map((data: string, i: number) => (
           <Box key={data + i} display={"flex"} width={"full"}>
             <Text>{i + 1}</Text>
-            <Card label={data} onClick={() => handleClick(i)}>
+            <Card
+              isActive={_activeIndex.value == i}
+              label={data}
+              onClick={() => handleClick(i)}
+            >
               <img className="preview-download" src={_image} loading="lazy" />
             </Card>
           </Box>
