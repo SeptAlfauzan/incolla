@@ -1,10 +1,14 @@
-import { Box, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
-import React from "react";
 import {
-  IoArrowDownSharp,
-  IoCaretDownSharp,
-  IoChevronDownCircleOutline,
-} from "react-icons/io5";
+  Box,
+  Image,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
+import React from "react";
+import { IoIosArrowDown } from "react-icons/io";
 import { Link } from "react-router-dom";
 
 const Navbar: React.FC = () => {
@@ -16,10 +20,30 @@ const Navbar: React.FC = () => {
       borderColor={"blackAlpha.200"}
       fontSize={"sm"}
       padding={"10px 20px"}
+      zIndex={400}
       backgroundColor={"white"}
     >
       <Menu>
-        <MenuButton>Incolla</MenuButton>
+        <MenuButton>
+          <Box
+            display={"flex"}
+            alignItems={"end"}
+            gap={1}
+            textColor={"blackAlpha.600"}
+          >
+            <Image
+              src="/src/assets/logo/incolla_logo (1).png"
+              width={8}
+              height={8}
+            />{" "}
+            <Text fontWeight={500} fontSize={20}>
+              Incolla
+            </Text>
+            <Box marginBottom={2}>
+              <IoIosArrowDown />
+            </Box>
+          </Box>
+        </MenuButton>
         <MenuList zIndex={200}>
           <MenuItem as={Link} to={"/"}>
             Create new
